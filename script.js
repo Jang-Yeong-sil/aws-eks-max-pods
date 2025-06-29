@@ -1159,6 +1159,11 @@ function loadSelectedInstances() {
         if (saved) {
             selectedInstances = JSON.parse(saved);
             updateSavedList();
+            
+            // 선택된 인스턴스가 있으면 results-section을 보이도록 함
+            if (selectedInstances.length > 0) {
+                resultsSection.style.display = 'block';
+            }
         }
     } catch (error) {
         console.error('Failed to load selected instances from localStorage:', error);
@@ -1350,6 +1355,12 @@ function updateSavedList() {
     
     if (selectedInstances.length === 0) {
         savedList.innerHTML = '<p class="no-items">No instances selected</p>';
+        
+        // 선택된 인스턴스가 없고 검색 결과도 없으면 results-section 숨기기
+        const hasSearchResults = resultsTableBody && resultsTableBody.children.length > 0;
+        if (!hasSearchResults) {
+            resultsSection.style.display = 'none';
+        }
         return;
     }
     
@@ -1390,6 +1401,14 @@ function removeSelectedInstance(instanceName) {
             icon.textContent = '☐';
         }
     }
+    
+    // 선택된 인스턴스가 모두 없어지고 검색 결과도 없으면 results-section 숨기기
+    if (selectedInstances.length === 0) {
+        const hasSearchResults = resultsTableBody && resultsTableBody.children.length > 0;
+        if (!hasSearchResults) {
+            resultsSection.style.display = 'none';
+        }
+    }
 }
 
 // 모든 선택 항목 삭제
@@ -1407,6 +1426,12 @@ function clearAllSelected() {
             icon.textContent = '☐';
         }
     });
+    
+    // 검색 결과가 없으면 results-section 숨기기
+    const hasSearchResults = resultsTableBody && resultsTableBody.children.length > 0;
+    if (!hasSearchResults) {
+        resultsSection.style.display = 'none';
+    }
 }
 
 // 클립보드로 모든 선택 항목 복사

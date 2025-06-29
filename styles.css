@@ -83,6 +83,10 @@ body {
     font-weight: 400;
     color: #333;
     background: transparent;
+    ime-mode: disabled;
+    -webkit-ime-mode: disabled;
+    -moz-ime-mode: disabled;
+    -ms-ime-mode: disabled;
 }
 
 .search-input::placeholder {
@@ -327,7 +331,7 @@ body {
 
 .results-table th {
     background: #f8f9ff;
-    padding: 20px;
+    padding: 16px 12px;
     text-align: left;
     font-weight: 600;
     color: #4a5568;
@@ -336,7 +340,7 @@ body {
 }
 
 .results-table td {
-    padding: 20px;
+    padding: 16px 12px;
     border-bottom: 1px solid #f0f0f0;
     color: #333;
     font-weight: 400;
@@ -410,25 +414,46 @@ body {
 }
 
 /* Responsive design */
+/* 중간 크기 화면 (태블릿) */
 @media (max-width: 1024px) {
     .results-container {
         flex-direction: column;
-        gap: 16px;
+        gap: 20px;
     }
     
     .saved-section {
         width: 100%;
         order: 2;
+        max-width: 100%;
     }
     
     .table-container {
         order: 1;
+        width: 100%;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 14px 10px;
+        font-size: 0.9rem;
+    }
+    
+    /* 자동완성 최적화 */
+    .search-suggestions {
+        max-height: 250px;
+        border-radius: 12px;
+    }
+    
+    .suggestion-item {
+        padding: 12px 16px;
     }
 }
 
+/* 768px - 태블릿 */
 @media (max-width: 768px) {
     .container {
         padding: 0 16px;
+        max-width: 100%;
     }
     
     .logo h1 {
@@ -436,59 +461,207 @@ body {
     }
     
     .search-input {
-        padding: 16px 20px;
+        padding: 16px 18px;
         font-size: 1rem;
+        border-radius: 12px;
     }
     
     .search-button {
-        padding: 16px 20px;
+        padding: 16px 18px;
+        border-radius: 12px;
     }
     
-    .results-table {
-        min-width: 650px;
-    }
-    
-    .results-table th,
-    .results-table td {
-        padding: 16px 12px;
+    .search-suggestions {
+        max-height: 200px;
+        border-radius: 12px;
         font-size: 0.9rem;
     }
     
-    .formula-card {
-        padding: 20px;
+    .suggestion-item {
+        padding: 12px 16px;
     }
     
-    .formula {
-        font-size: 0.9rem;
-        padding: 10px 12px;
+    .results-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 16px;
     }
-}
-
-@media (max-width: 480px) {
-    .logo h1 {
-        font-size: 2rem;
+    
+    /* 테이블 최적화 */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
     }
     
     .results-table {
-        font-size: 0.8rem;
+        min-width: 600px;
+        width: auto;
     }
     
     .results-table th,
     .results-table td {
         padding: 12px 8px;
+        font-size: 0.85rem;
     }
     
+    .results-table th:first-child,
+    .results-table td:first-child {
+        min-width: 140px;
+        word-break: break-word;
+    }
+    
+    .results-table th:nth-child(2),
+    .results-table td:nth-child(2) {
+        min-width: 80px;
+        text-align: center;
+    }
+    
+    .results-table th:nth-child(3),
+    .results-table td:nth-child(3) {
+        min-width: 60px;
+        text-align: center;
+    }
+    
+    .results-table th:nth-child(4),
+    .results-table td:nth-child(4) {
+        min-width: 70px;
+        text-align: center;
+    }
+    
+    .results-table th:nth-child(5),
+    .results-table td:nth-child(5) {
+        min-width: 60px;
+        text-align: center;
+    }
+    
+    /* 공식 섹션 */
+    .formula-card {
+        padding: 16px;
+    }
+    
+    .formula {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
+}
+
+/* 480px - 모바일 */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 12px;
+    }
+    
+    .logo h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+        margin-bottom: 32px;
+    }
+    
+    .search-input {
+        padding: 14px 16px;
+        font-size: 16px; /* iOS 줌 방지 */
+        border-radius: 12px;
+    }
+    
+    .search-button {
+        padding: 14px 16px;
+        border-radius: 12px;
+    }
+    
+    .search-suggestions {
+        max-height: 150px;
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+    
+    .suggestion-item {
+        padding: 10px 12px;
+    }
+    
+    .results-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+    }
+    
+    /* 테이블 최적화 */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+    }
+    
+    .results-table {
+        min-width: 500px;
+        width: auto;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+    }
+    
+    .results-table th:first-child,
+    .results-table td:first-child {
+        min-width: 120px;
+        word-break: break-word;
+    }
+    
+    .results-table th:nth-child(2),
+    .results-table td:nth-child(2) {
+        min-width: 70px;
+        text-align: center;
+    }
+    
+    .results-table th:nth-child(3),
+    .results-table td:nth-child(3) {
+        min-width: 50px;
+        text-align: center;
+    }
+    
+    .results-table th:nth-child(4),
+    .results-table td:nth-child(4) {
+        min-width: 60px;
+        text-align: center;
+    }
+    
+    .results-table th:nth-child(5),
+    .results-table td:nth-child(5) {
+        min-width: 50px;
+        text-align: center;
+    }
+    
+    /* 공식 섹션 */
+    .formula-card {
+        padding: 12px;
+    }
+    
+    .formula-card h4 {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+    
+    .formula {
+        font-size: 0.65rem;
+        padding: 6px 8px;
+    }
+    
+    /* 저장 섹션 */
     .saved-section {
         padding: 12px;
     }
     
     .saved-header h3 {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
     
     .clear-btn, .copy-btn {
-        font-size: 0.6rem;
-        padding: 2px 4px;
+        font-size: 0.65rem;
+        padding: 3px 6px;
     }
     
     .header-buttons {
@@ -496,11 +669,11 @@ body {
     }
     
     .saved-item {
-        font-size: 0.6rem;
-        padding: 6px 8px;
+        font-size: 0.65rem;
+        padding: 8px 10px;
     }
     
     .remove-indicator {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
 } 
