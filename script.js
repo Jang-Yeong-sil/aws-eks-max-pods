@@ -1149,6 +1149,32 @@ const copyBtn = document.getElementById('copyBtn');
 // 선택된 인스턴스들을 저장할 배열
 let selectedInstances = [];
 
+// localStorage 키 이름
+const STORAGE_KEY = 'aws-eks-selected-instances';
+
+// localStorage에서 선택된 인스턴스들 불러오기
+function loadSelectedInstances() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            selectedInstances = JSON.parse(saved);
+            updateSavedList();
+        }
+    } catch (error) {
+        console.error('Failed to load selected instances from localStorage:', error);
+        selectedInstances = [];
+    }
+}
+
+// localStorage에 선택된 인스턴스들 저장
+function saveSelectedInstances() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedInstances));
+    } catch (error) {
+        console.error('Failed to save selected instances to localStorage:', error);
+    }
+}
+
 // 파드 수 계산 함수
 function calculateMaxPods(eni, ipPerEni) {
     return (eni * (ipPerEni - 1)) + 2;
@@ -1315,6 +1341,7 @@ function handleCellClick(event) {
     }
     
     updateSavedList();
+    saveSelectedInstances();
 }
 
 // 선택된 항목 목록 업데이트
@@ -1352,6 +1379,7 @@ function updateSavedList() {
 function removeSelectedInstance(instanceName) {
     selectedInstances = selectedInstances.filter(item => item.name !== instanceName);
     updateSavedList();
+    saveSelectedInstances();
     
     // 테이블의 셀 상태도 해제
     const cell = document.querySelector(`td[data-instance*='"name":"${instanceName}"']`);
@@ -1368,6 +1396,7 @@ function removeSelectedInstance(instanceName) {
 function clearAllSelected() {
     selectedInstances = [];
     updateSavedList();
+    localStorage.removeItem(STORAGE_KEY);
     
     // 모든 셀 상태 해제
     const selectCells = document.querySelectorAll('.select-cell');
@@ -1420,7 +1449,11 @@ copyBtn.addEventListener('click', copyAllSelected);
 document.addEventListener('DOMContentLoaded', () => {
     instanceInput.focus();
     
+    // localStorage에서 선택된 인스턴스들 불러오기
+    loadSelectedInstances();
+    
          // Initialize with test data
      console.log('AWS EKS Max Pods Calculator loaded');
      console.log('Available instance types:', Object.keys(instanceData).length);
+     console.log('Loaded selected instances:', selectedInstances.length);
 }); 
