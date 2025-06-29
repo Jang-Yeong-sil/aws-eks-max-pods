@@ -1142,6 +1142,12 @@ const searchBtn = document.getElementById('searchBtn');
 const suggestionsDiv = document.getElementById('suggestions');
 const resultsSection = document.getElementById('resultsSection');
 const resultsTableBody = document.getElementById('resultsTableBody');
+const savedList = document.getElementById('savedList');
+const clearBtn = document.getElementById('clearBtn');
+const copyBtn = document.getElementById('copyBtn');
+
+// 선택된 인스턴스들을 저장할 배열
+let selectedInstances = [];
 
 // 파드 수 계산 함수
 function calculateMaxPods(eni, ipPerEni) {
@@ -1157,15 +1163,25 @@ function displayResults(instances) {
         const data = instanceData[instance];
         const maxPods = calculateMaxPods(data.eni, data.ipPerEni);
         
+        // 체크박스 상태 확인
+        const isSelected = selectedInstances.some(selected => selected.name === instance);
+        
         row.innerHTML = `
             <td><strong>${instance}</strong></td>
             <td><span style="color: #667eea; font-weight: 600;">${maxPods}</span></td>
             <td>${data.eni}</td>
             <td>${data.ipPerEni}</td>
+            <td class="select-cell ${isSelected ? 'selected' : ''}" 
+                data-instance='${JSON.stringify({name: instance, maxPods, eni: data.eni, ipPerEni: data.ipPerEni})}'>
+                <span class="select-icon">${isSelected ? '☑' : '☐'}</span>
+            </td>
         `;
         
         resultsTableBody.appendChild(row);
     });
+    
+    // 셀 클릭 이벤트 리스너 추가
+    attachCellClickListeners();
     
     resultsSection.style.display = 'block';
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1268,6 +1284,137 @@ document.addEventListener('click', (e) => {
         suggestionsDiv.style.display = 'none';
     }
 });
+
+// 셀 클릭 이벤트 리스너 연결
+function attachCellClickListeners() {
+    const selectCells = document.querySelectorAll('.select-cell');
+    selectCells.forEach(cell => {
+        cell.addEventListener('click', handleCellClick);
+    });
+}
+
+// 셀 클릭 이벤트 처리
+function handleCellClick(event) {
+    const cell = event.currentTarget;
+    const instanceData = JSON.parse(cell.dataset.instance);
+    const isCurrentlySelected = cell.classList.contains('selected');
+    
+    if (isCurrentlySelected) {
+        // 선택 해제
+        cell.classList.remove('selected');
+        cell.querySelector('.select-icon').textContent = '☐';
+        selectedInstances = selectedInstances.filter(item => item.name !== instanceData.name);
+    } else {
+        // 선택
+        cell.classList.add('selected');
+        cell.querySelector('.select-icon').textContent = '☑';
+        // 중복 체크 방지
+        if (!selectedInstances.some(item => item.name === instanceData.name)) {
+            selectedInstances.push(instanceData);
+        }
+    }
+    
+    updateSavedList();
+}
+
+// 선택된 항목 목록 업데이트
+function updateSavedList() {
+    const noItemsMsg = savedList.querySelector('.no-items');
+    
+    if (selectedInstances.length === 0) {
+        savedList.innerHTML = '<p class="no-items">No instances selected</p>';
+        return;
+    }
+    
+    if (noItemsMsg) {
+        noItemsMsg.remove();
+    }
+    
+    savedList.innerHTML = selectedInstances
+        .map(instance => `
+            <div class="saved-item" data-name="${instance.name}">
+                <span class="item-content">${instance.name}\t${instance.maxPods}</span>
+                <span class="remove-indicator">×</span>
+            </div>
+        `)
+        .join('');
+    
+    // 개별 삭제 클릭 이벤트 리스너 추가
+    savedList.querySelectorAll('.saved-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const instanceName = e.currentTarget.dataset.name;
+            removeSelectedInstance(instanceName);
+        });
+    });
+}
+
+// 선택된 인스턴스 개별 삭제
+function removeSelectedInstance(instanceName) {
+    selectedInstances = selectedInstances.filter(item => item.name !== instanceName);
+    updateSavedList();
+    
+    // 테이블의 셀 상태도 해제
+    const cell = document.querySelector(`td[data-instance*='"name":"${instanceName}"']`);
+    if (cell) {
+        cell.classList.remove('selected');
+        const icon = cell.querySelector('.select-icon');
+        if (icon) {
+            icon.textContent = '☐';
+        }
+    }
+}
+
+// 모든 선택 항목 삭제
+function clearAllSelected() {
+    selectedInstances = [];
+    updateSavedList();
+    
+    // 모든 셀 상태 해제
+    const selectCells = document.querySelectorAll('.select-cell');
+    selectCells.forEach(cell => {
+        cell.classList.remove('selected');
+        const icon = cell.querySelector('.select-icon');
+        if (icon) {
+            icon.textContent = '☐';
+        }
+    });
+}
+
+// 클립보드로 모든 선택 항목 복사
+async function copyAllSelected() {
+    if (selectedInstances.length === 0) {
+        alert('No instances selected to copy.');
+        return;
+    }
+    
+    const textToCopy = selectedInstances
+        .map(instance => `${instance.name}\t${instance.maxPods}`)
+        .join('\n');
+    
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        
+        // 버튼 텍스트를 일시적으로 변경하여 피드백 제공
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        copyBtn.style.background = 'rgba(34, 197, 94, 0.4)';
+        
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.style.background = 'rgba(102, 126, 234, 0.3)';
+        }, 1500);
+        
+    } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+        alert('Failed to copy to clipboard. Please try again.');
+    }
+}
+
+// Clear All 버튼 이벤트 리스너
+clearBtn.addEventListener('click', clearAllSelected);
+
+// Copy All 버튼 이벤트 리스너
+copyBtn.addEventListener('click', copyAllSelected);
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {

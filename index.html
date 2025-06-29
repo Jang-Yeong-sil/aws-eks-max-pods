@@ -40,19 +40,34 @@
                 <div class="results-header">
                     <h2>Search Results</h2>
                 </div>
-                <div class="table-container">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Instance Name</th>
-                                <th>Max Pods</th>
-                                <th>Network Interfaces</th>
-                                <th>IP Addresses per Interface</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
-                        </tbody>
-                    </table>
+                <div class="results-container">
+                    <div class="table-container">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Instance Name</th>
+                                    <th>Max Pods</th>
+                                    <th>Network Interfaces</th>
+                                    <th>IP Addresses per Interface</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="saved-section" id="savedSection">
+                        <div class="saved-header">
+                            <h3>Selected</h3>
+                            <div class="header-buttons">
+                                <button class="copy-btn" id="copyBtn">Copy All</button>
+                                <button class="clear-btn" id="clearBtn">Clear All</button>
+                            </div>
+                        </div>
+                        <div class="saved-list" id="savedList">
+                            <p class="no-items">No instances selected</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
