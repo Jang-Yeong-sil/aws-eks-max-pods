@@ -1226,8 +1226,7 @@ function showSuggestions(query) {
     }
     
     const filtered = Object.keys(instanceData)
-        .filter(instance => instance.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 8);
+        .filter(instance => instance.toLowerCase().includes(query.toLowerCase()));
     
     if (filtered.length === 0) {
         suggestionsDiv.style.display = 'none';
@@ -1279,8 +1278,7 @@ function performSearch() {
     
     // 부분 매치 찾기
     const partialMatches = Object.keys(instanceData)
-        .filter(instance => instance.toLowerCase().includes(query))
-        .slice(0, 10);
+        .filter(instance => instance.toLowerCase().includes(query));
     
     if (partialMatches.length > 0) {
         displayResults(partialMatches);
